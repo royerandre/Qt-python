@@ -1,58 +1,89 @@
 import tkinter as tk
 from tkinter import messagebox
 
-# --- AQUÍ VA LA LÓGICA (EL CEREBRO) ---
 def calcular():
     try:
-        # 1. Obtenemos lo que escribió el usuario en las cajas
-        # .get() toma el texto
+        # 1. Obtenemos las notas (Si están vacías, dará error y saltará al except)
         n1 = float(entry_n1.get())
         n2 = float(entry_n2.get())
         n3 = float(entry_n3.get())
+        
+        promedio = 0
+        opcion = variable_formula.get() # Obtenemos qué círculo se marcó (1, 2 o 3)
 
-        # 2. Aplicamos la fórmula (Ejemplo: 1x2x2)
-        # Suma de pesos = 5
-        promedio = (n1 * 1 + n2 * 2 + n3 * 2) / 5
+        # 2. Lógica de las Fórmulas (Idéntica a tu QML)
+        if opcion == 1:
+            # Fórmula 1x2x2 (Suma pesos = 5)
+            promedio = (n1 * 1 + n2 * 2 + n3 * 2) / 5
+            formula_usada = "1x2x2"
+            
+        elif opcion == 2:
+            # Fórmula 2x2x1 (Suma pesos = 5)
+            promedio = (n1 * 2 + n2 * 2 + n3 * 1) / 5
+            formula_usada = "2x2x1"
+            
+        elif opcion == 3:
+            # Fórmula 1x2x3 (Suma pesos = 6)
+            promedio = (n1 * 1 + n2 * 2 + n3 * 3) / 6
+            formula_usada = "1x2x3"
+        else:
+            messagebox.showwarning("Atención", "¡Por favor selecciona una fórmula!")
+            return
 
-        # 3. Mostramos el resultado en la etiqueta de abajo
-        # .config() cambia las propiedades, como el texto
-        label_resultado.config(text=f"Tu Nota Final es: {promedio:.2f}", fg="blue")
+        # 3. Mostrar resultado
+        label_resultado.config(text=f"Nota Final ({formula_usada}): {promedio:.2f}", fg="#0078d7")
 
     except ValueError:
-        # Si escriben letras o lo dejan vacío, salta este error
-        messagebox.showerror("Error", "¡Por favor ingresa solo números!")
+        messagebox.showerror("Error", "Asegúrate de ingresar solo números en las casillas.")
 
-# --- AQUÍ VA EL DISEÑO (LA CARA) ---
+# --- CONFIGURACIÓN DE LA VENTANA ---
 ventana = tk.Tk()
-ventana.title("Calculadora Python")
-ventana.geometry("300x350") # Tamaño de la ventana
+ventana.title("CalcUAC Python")
+ventana.geometry("350x450")
+ventana.configure(bg="#f0f0f0") # Color de fondo gris suave
 
-# Creamos los textos y las cajas (Entradas)
-tk.Label(ventana, text="Ingrese sus notas:", font=("Arial", 12, "bold")).pack(pady=10)
+# Título
+tk.Label(ventana, text="Calculadora de Notas", font=("Segoe UI", 16, "bold"), bg="#f0f0f0").pack(pady=15)
 
-tk.Label(ventana, text="Nota 1:").pack()
-entry_n1 = tk.Entry(ventana) # Caja de texto
-entry_n1.pack()
+# --- SELECCIÓN DE FÓRMULA (RADIO BUTTONS) ---
+tk.Label(ventana, text="Seleccione fórmula:", bg="#f0f0f0", font=("Segoe UI", 10)).pack()
 
-tk.Label(ventana, text="Nota 2:").pack()
-entry_n2 = tk.Entry(ventana)
-entry_n2.pack()
+# Esta variable guardará la opción elegida (1, 2 o 3)
+variable_formula = tk.IntVar() 
+variable_formula.set(1) # Marcamos la primera por defecto para que no falle
 
-tk.Label(ventana, text="Nota 3:").pack()
-entry_n3 = tk.Entry(ventana)
-entry_n3.pack()
+frame_radios = tk.Frame(ventana, bg="#f0f0f0")
+frame_radios.pack(pady=5)
 
-# Espacio vacío
-tk.Label(ventana, text="").pack()
+tk.Radiobutton(frame_radios, text="1x2x2", variable=variable_formula, value=1, bg="#f0f0f0").pack(anchor="w")
+tk.Radiobutton(frame_radios, text="2x2x1", variable=variable_formula, value=2, bg="#f0f0f0").pack(anchor="w")
+tk.Radiobutton(frame_radios, text="1x2x3", variable=variable_formula, value=3, bg="#f0f0f0").pack(anchor="w")
 
-# El Botón
-boton = tk.Button(ventana, text="Calcular Promedio", command=calcular, bg="lightgray")
-boton.pack(ipadx=10, ipady=5) # ipadx/y es el relleno interno del botón
+# --- CAJAS DE NOTAS ---
+tk.Label(ventana, text="Ingrese sus notas:", bg="#f0f0f0", font=("Segoe UI", 10, "bold")).pack(pady=(15, 5))
 
-# Espacio para el resultado
-tk.Label(ventana, text="").pack()
-label_resultado = tk.Label(ventana, text="---", font=("Arial", 14))
+frame_notas = tk.Frame(ventana, bg="#f0f0f0")
+frame_notas.pack()
+
+tk.Label(frame_notas, text="Nota 1:", bg="#f0f0f0").grid(row=0, column=0, padx=5, pady=5)
+entry_n1 = tk.Entry(frame_notas, width=10, justify="center")
+entry_n1.grid(row=0, column=1)
+
+tk.Label(frame_notas, text="Nota 2:", bg="#f0f0f0").grid(row=1, column=0, padx=5, pady=5)
+entry_n2 = tk.Entry(frame_notas, width=10, justify="center")
+entry_n2.grid(row=1, column=1)
+
+tk.Label(frame_notas, text="Nota 3:", bg="#f0f0f0").grid(row=2, column=0, padx=5, pady=5)
+entry_n3 = tk.Entry(frame_notas, width=10, justify="center")
+entry_n3.grid(row=2, column=1)
+
+# --- BOTÓN CALCULAR ---
+btn_calcular = tk.Button(ventana, text="Calcular Promedio", command=calcular, bg="#0078d7", fg="white", font=("Segoe UI", 10, "bold"), relief="flat", padx=20, pady=5)
+btn_calcular.pack(pady=20)
+
+# --- RESULTADO ---
+label_resultado = tk.Label(ventana, text="Tu promedio aparecerá aquí", font=("Segoe UI", 12), bg="#f0f0f0")
 label_resultado.pack()
 
-# Esto mantiene la ventana abierta
+# Iniciar la aplicación
 ventana.mainloop()
